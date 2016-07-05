@@ -16,4 +16,13 @@ class BindAccountHelper(object):
             username = row.username
         except BindAccount.DoesNotExist:
             username = None
-        username
+        return username
+
+    def bind_new_account(self, username, account_type, account_value):
+        rows = BindAccount.objects.filter(username=username, value=account_value, type=account_type)
+        if len(rows) == 0:
+            BindAccount(
+                username=username,
+                value=account_value,
+                type=account_type
+            ).save()

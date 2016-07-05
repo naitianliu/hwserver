@@ -8,7 +8,10 @@ from django.db import models
 class VerificationCode(models.Model):
     phone_number = models.CharField(max_length=30)
     code = models.CharField(max_length=10)
-    created_time = models.DateTimeField(auto_now=True)
+    created_time = models.IntegerField()
+
+    def __unicode__(self):
+        return self.phone_number
 
 
 class Profile(models.Model):

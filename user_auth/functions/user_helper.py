@@ -20,16 +20,22 @@ class UserHelper(object):
         return result
 
     def register(self, username, password):
-        user = User.objects.create_user(
-            username=username,
-            password=password
-        )
-        user.save()
+        if not User.objects.filter(username=username):
+            user = User.objects.create_user(
+                username=username,
+                password=password
+            )
+            user.save()
 
     def login(self, username, password):
         user_obj = auth.authenticate(username=username, password=password)
         result = True if user_obj else False
         return result
+
+    def reset_password(self, username, password):
+        user = User.objects.get(username=username)
+        user.set_password(password)
+        user.save()
 
     def generate_token(self, username):
         user = User.objects.get(username=username)

@@ -19,15 +19,17 @@ class PhoneLoginHelper(object):
         else:
             error_code = 1051
         if error_code == 0:
-            username = self.user_helper
+            username = self.user_helper.generate_username(self.phone_number, 'phone')
+            print username
             self.user_helper.register(username, password)
+            self.bind_account_helper.bind_new_account(username, 'phone', self.phone_number)
             token = self.user_helper.generate_token(username)
         else:
             token = None
         return error_code, token
 
-    def login(self, phone_number, password):
-        username = self.bind_account_helper.get_username_by_phone(phone_number)
+    def login(self, password):
+        username = self.bind_account_helper.get_username_by_phone(self.phone_number)
         if username:
             if self.user_helper.login(username, password):
                 error_code = 0
@@ -36,7 +38,16 @@ class PhoneLoginHelper(object):
         else:
             error_code = 1010
         token = self.user_helper.generate_token(username) if error_code == 0 else None
-        return token
+        return error_code, token
 
-    def reset_password(self):
-        pass
+    def reset_password(self, code, password):
+        if self.verify_code_helper.verify_code(code) == 0:
+            if self.bind_account_helper.check_new_user_by_phone(self.phone_number):
+                error_code = 1040
+            else:
+                error_code = 0
+        else:
+            error_code = 1051
+        username = self.bind_account_helper.get_username_by_phone(self.phone_number)
+        token = self.user_helper.reset_password(username, password) if error_code == 0 and username else None
+        return error_code, token

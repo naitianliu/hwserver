@@ -7,6 +7,12 @@ import datetime
 class VerificationCodeHelper(object):
     def __init__(self, phone_number):
         self.phone_number = phone_number
+        timestamp_str = datetime.datetime.now().strftime('%s')
+        self.datetime_now = int(timestamp_str)
+        one_hour_ago_str = (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%s')
+        self.one_hour_ago = int(one_hour_ago_str)
+        one_day_ago_str = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%s')
+        self.one_day_ago = int(one_day_ago_str)
 
     def send_code(self):
         if self.__check_if_hit_limit():
@@ -19,8 +25,7 @@ class VerificationCodeHelper(object):
         return error_code
 
     def verify_code(self, code):
-        one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
-        rows = VerificationCode.objects.filter(phone_number=self.phone_number, code=code, created_time__gt=one_hour_ago)
+        rows = VerificationCode.objects.filter(phone_number=self.phone_number, code=code, created_time__gt=self.one_hour_ago)
         valid = len(rows) > 0
         error_code = 0 if valid else 1030
         return error_code
@@ -30,12 +35,12 @@ class VerificationCodeHelper(object):
         code = str(code)
         VerificationCode(
             phone_number=self.phone_number,
-            code=code
+            code=code,
+            created_time=self.datetime_now
         ).save()
         return code
 
     def __check_if_hit_limit(self):
-        one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
-        rows = VerificationCode.objects.filter(phone_number=self.phone_number, created_time__gt=one_day_ago)
+        rows = VerificationCode.objects.filter(phone_number=self.phone_number, created_time__gt=self.one_day_ago)
         result = len(rows) > 5
         return result

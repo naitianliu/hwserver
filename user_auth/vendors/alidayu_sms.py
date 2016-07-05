@@ -9,6 +9,7 @@ class SMSHelper(object):
         self.sms_template_code = VENDORS['alidayu']['sms_template_code']
         self.app_key = VENDORS['alidayu']['app_key']
         self.app_secret = VENDORS['alidayu']['app_secret']
+        print self.sms_free_sign_name
 
     def send_code_via_sms(self, phone_number, code):
         req = top.api.AlibabaAliqinFcSmsNumSendRequest()
