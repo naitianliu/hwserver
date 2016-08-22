@@ -60,3 +60,5 @@ class JoinClassroomRequest(models.Model):
 
     def __unicode__(self):
         return self.requester
+
+
