@@ -19,7 +19,11 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
+    url(r'^api/v1/auth/', include('user_auth.urls')),
+
     url(r'^api/v1/vendors/', include('api.urls_set.vendors')),
 
-    url(r'^api/v1/auth/', include('user_auth.urls'))
+    url(r'^api/v1/school/', include('api.urls_set.school')),
+    url(r'^api/v1/classroom/', include('api.urls_set.classroom')),
+
 ]

@@ -16,8 +16,11 @@ class VerificationCode(models.Model):
 
 class Profile(models.Model):
     username = models.CharField(max_length=50)
-    nickname = models.CharField(max_length=100)
-    img_url = models.TextField()
+    nickname = models.CharField(max_length=100, blank=True, null=True)
+    img_url = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.username
 
 
 class BindAccount(models.Model):

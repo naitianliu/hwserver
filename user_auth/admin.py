@@ -4,3 +4,4 @@ from user_auth.models import *
 # Register your models here.
 
 admin.site.register(VerificationCode)
+admin.site.register(Profile)
