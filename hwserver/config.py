@@ -30,5 +30,10 @@ VENDORS = {
 OTS = {
     'access_key_id': 'HePLlPUE2bQze4T2',
     'access_key_secret': 'uAQ2p83daghEMALd042nl4MYlhPHFT',
-    'instance_endpoint': OTS_INSTANCE_ENDPOINT
+    'instance_endpoint': OTS_INSTANCE_ENDPOINT,
+    'table': {
+        'homework': 'homework_table',
+        'comment': 'comment_table',
+        'student_submission': 'student_submission_table'
+    }
 }
