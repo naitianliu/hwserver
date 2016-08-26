@@ -6,7 +6,7 @@ import datetime
 class SchoolHelper(object):
     def __init__(self, user_id):
         self.user_id = user_id
-        self.time_now = datetime.datetime.now()
+        self.timestamp_now = int(datetime.datetime.now().strftime('%s'))
 
     def create_new_school(self, name, location_dict=None, address=None):
         school_uuid = uuid.uuid1()
@@ -20,9 +20,10 @@ class SchoolHelper(object):
             location_y=location_y,
             address=address,
             active=True,
-            created_time=self.time_now,
-            last_updated_time=self.time_now
+            created_timestamp=self.timestamp_now,
+            updated_timestamp=self.timestamp_now
         ).save()
+        return school_uuid
 
     def get_school_list(self):
         schools = []
@@ -35,8 +36,8 @@ class SchoolHelper(object):
                 location_y=row.location_y,
                 address=row.address,
                 active=row.active,
-                created_time=row.created_time,
-                last_updated_time=row.last_updated_time
+                created_timestamp=row.created_timestamp,
+                updated_timestamp=row.updated_timestamp
             ))
         return schools
 
@@ -52,7 +53,7 @@ class SchoolHelper(object):
                 row.location_y = location_y
             if address:
                 row.address = address
-            row.last_updated_time = self.time_now
+            row.updated_timestamp = self.timestamp_now
             row.save()
             return True
         except School.DoesNotExist:
@@ -62,7 +63,7 @@ class SchoolHelper(object):
         try:
             row = School.objects.get(uuid=school_uuid)
             row.active = False
-            row.last_updated_time = self.time_now
+            row.updated_timestamp = self.timestamp_now
             row.save()
             return True
         except School.DoesNotExist:

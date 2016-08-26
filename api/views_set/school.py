@@ -11,9 +11,12 @@ def school_create(request):
     name = req_data['name']
     location_dict = req_data['location'] if 'location' in req_data else None
     address = req_data['address'] if 'address' in req_data else None
-    SchoolHelper(user_id).create_new_school(name, location_dict=location_dict, address=address)
+    school_helper = SchoolHelper(user_id)
+    school_uuid = school_helper.create_new_school(name, location_dict=location_dict, address=address)
     res_data = dict(
-        error=0
+        error=0,
+        school_uuid=school_uuid,
+        timestamp=school_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -41,13 +44,15 @@ def school_update(request):
     name = req_data['name'] if 'name' in req_data else None
     location_dict = req_data['location'] if 'location' in req_data else None
     address = req_data['address'] if 'address' in req_data else None
-    success = SchoolHelper(user_id).update_school_info(
+    school_helper = SchoolHelper(user_id)
+    success = school_helper.update_school_info(
         school_uuid,
         name=name,
         location_dict=location_dict,
         address=address)
     res_data = dict(
         error=success,
+        timestamp=school_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -59,8 +64,10 @@ def school_close(request):
     user_id = request.user.username
     req_data = json.loads(request.body)
     school_uuid = req_data['uuid']
-    success = SchoolHelper(user_id).close_school(school_uuid)
+    school_helper = SchoolHelper(user_id)
+    success = school_helper.close_school(school_uuid)
     res_data = dict(
-        error=success
+        error=success,
+        timestamp=school_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)

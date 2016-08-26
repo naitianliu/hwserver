@@ -9,10 +9,10 @@ import datetime
 class ClassroomHelper(object):
     def __init__(self, user_id, role):
         self.user_id = user_id
-        self.time_now = datetime.datetime.now()
+        self.timestamp_now = int(datetime.datetime.now().strftime('%s'))
         self.role = role
 
-    def create_new_classroom(self, name, school_uuid, members=None):
+    def create_new_classroom(self, name, school_uuid, description=None, members=None):
         """teacher only"""
         """
         members example:
@@ -26,23 +26,29 @@ class ClassroomHelper(object):
         Classroom(
             uuid=classroom_uuid,
             name=name,
+            description=description,
             creator=self.user_id,
             school_uuid=school_uuid,
             code=code,
             active=True,
-            created_time=self.time_now,
-            last_updated_time=self.time_now
+            created_timestamp=self.timestamp_now,
+            updated_timestamp=self.timestamp_now
         ).save()
         if members:
             self.__add_members(classroom_uuid, members)
         return code
 
-    def update_classroom_info(self, classroom_uuid, name=None, members=None):
+    def update_classroom_info(self, classroom_uuid, name=None, description=None, members=None):
         """teacher only"""
         try:
             row = Classroom.objects.get(uuid=classroom_uuid)
+            if name or members or description:
+                row.updated_timestamp = self.timestamp_now
             if name:
                 row.name = name
+                row.save()
+            if description:
+                row.description = description
                 row.save()
             if members:
                 self.__add_members(classroom_uuid, members)
@@ -56,7 +62,7 @@ class ClassroomHelper(object):
             row = Classroom.objects.get(uuid=classroom_uuid)
             if row.creator == self.user_id:
                 row.active = False
-                row.last_updated_time = self.time_now
+                row.updated_timestamp = self.timestamp_now
                 row.save()
                 return True
             else:
@@ -93,8 +99,8 @@ class ClassroomHelper(object):
                 role=self.role,
                 comment=comment,
                 status="pending",
-                created_time=self.time_now,
-                last_updated_time=self.time_now
+                created_timestamp=self.timestamp_now,
+                updated_timestamp=self.timestamp_now
             ).save()
         return request_uuid
 
@@ -104,7 +110,7 @@ class ClassroomHelper(object):
             row = JoinClassroomRequest.objects.get(uuid=request_uuid)
             row.status = "approved"
             row.approver = self.user_id
-            row.last_updated_time = self.time_now
+            row.updated_timestamp = self.timestamp_now
             row.save()
             classroom_uuid = row.classroom_uuid
             role = row.role
@@ -129,8 +135,8 @@ class ClassroomHelper(object):
                 role=row.role,
                 comment=row.comment,
                 status=row.status,
-                created_time=row.created_time,
-                last_updated_time=row.last_updated_time
+                created_timestamp=row.created_time,
+                updated_timestamp=row.last_updated_time
             ))
         return pending_requests
 
@@ -166,11 +172,12 @@ class ClassroomHelper(object):
             classrooms.append(dict(
                 classroom_uuid=classroom_uuid,
                 name=row.name,
+                description=row.description,
                 creator=row.creator,
                 school_uuid=row.school_uuid,
                 code=row.code,
-                created_time=row.created_time,
-                last_updated_time=row.last_updated_time,
+                created_timestamp=row.created_time,
+                updated_timestamp=row.last_updated_time,
                 members=members_dict[classroom_uuid]
             ))
         return classrooms
@@ -199,7 +206,7 @@ class ClassroomHelper(object):
                                                   role=role)
                 if not row.active:
                     row.active = True
-                    row.last_updated_time = self.time_now
+                    row.last_updated_time = self.timestamp_now
                     row.save()
             except ClassroomMember.DoesNotExist:
                 ClassroomMember(
@@ -207,8 +214,8 @@ class ClassroomHelper(object):
                     user_id=user_id,
                     role=role,
                     active=True,
-                    created_time=self.time_now,
-                    last_updated_time=self.time_now
+                    created_timestamp=self.timestamp_now,
+                    updated_timestamp=self.timestamp_now
                 ).save()
 
     def __generate_code_string(self):

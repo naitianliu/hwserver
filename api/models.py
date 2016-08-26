@@ -8,12 +8,13 @@ from django.db import models
 class Classroom(models.Model):
     uuid = models.CharField(max_length=50)
     name = models.CharField(max_length=500)
+    description = models.TextField(null=True, blank=True)
     creator = models.CharField(max_length=200)
     school_uuid = models.CharField(max_length=50)
     code = models.CharField(max_length=20)
     active = models.BooleanField(default=True)
-    created_time = models.DateTimeField(auto_created=True)
-    last_updated_time = models.DateTimeField(auto_created=True, auto_now=True)
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
 
     def __unicode__(self):
         return self.name
@@ -27,8 +28,8 @@ class School(models.Model):
     location_y = models.FloatField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     active = models.BooleanField(default=True)
-    created_time = models.DateTimeField(auto_created=True, auto_now=True)
-    last_updated_time = models.DateTimeField(auto_created=True, auto_now=True)
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
 
     def __unicode__(self):
         return self.name
@@ -39,8 +40,8 @@ class ClassroomMember(models.Model):
     user_id = models.CharField(max_length=200)
     role = models.CharField(max_length=10)
     active = models.BooleanField(default=True)
-    created_time = models.DateTimeField(auto_created=True, auto_now=True)
-    last_updated_time = models.DateTimeField(auto_created=True, auto_now=True)
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
 
     def __unicode__(self):
         return self.user_id
@@ -55,8 +56,8 @@ class JoinClassroomRequest(models.Model):
     approver = models.CharField(max_length=200, null=True, blank=True)
     """status: pending, approved, rejected"""
     status = models.CharField(max_length=10)
-    created_time = models.DateTimeField(auto_created=True, auto_now=True)
-    last_updated_time = models.DateTimeField(auto_created=True, auto_now=True)
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
 
     def __unicode__(self):
         return self.requester

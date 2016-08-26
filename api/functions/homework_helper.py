@@ -1,4 +1,4 @@
-from ots2 import OTSClient, Condition
+from ots2 import OTSClient, Condition, INF_MIN, INF_MAX
 from hwserver.config import OTS
 import uuid
 
@@ -14,8 +14,7 @@ class HomeworkHelper(object):
         self.ots_client = OTSClient(OTS['instance_endpoint'],
                                     OTS['access_key_id'],
                                     OTS['access_key_secret'],
-                                    'homework',
-                                    logger_name='table_store.log')
+                                    'homework')
         self.user_id = user_id
         self.role = role
         self.homework_table = OTS['table']['homework']
@@ -81,13 +80,49 @@ class HomeworkHelper(object):
             print err
             return False
 
+    def close_homework(self, homework_uuid, classroom_uuid):
+        """teacher only"""
+        primary_key = dict(
+            homework_uuid=homework_uuid,
+            classroom_uuid=classroom_uuid,
+            status='open'
+
+        )
+        update_of_attribute_columns = dict(
+            put=dict(status='close')
+        )
+        condition = Condition('EXPECT_EXIST')
+        try:
+            self.ots_client.update_row(self.homework_table,
+                                       condition=condition,
+                                       primary_key=primary_key,
+                                       update_of_attribute_columns=update_of_attribute_columns)
+            return True
+        except Exception as err:
+            print err
+            return False
+
     def share_to_classroom(self):
         """teacher only"""
         pass
 
     def get_homework_list_by_classroom(self, classroom_uuid):
         """T & S"""
-        pass
+        inclusive_start_primary_key = {
+            'classroom_uuid': classroom_uuid,
+            'homework_uuid': '',
+            'status': ''
+        }
+        exclusive_end_primary_key = {
+            'classroom_uuid': classroom_uuid,
+            'homework_uuid': '',
+            'status': ''
+        }
+        consumed, next_start_primary_key, row_list = self.ots_client.get_range(self.homework_table,
+                                                                               'FORWARD',
+                                                                               inclusive_start_primary_key,
+                                                                               exclusive_end_primary_key)
+        return row_list
 
     def add_comment(self):
         """T & S"""
