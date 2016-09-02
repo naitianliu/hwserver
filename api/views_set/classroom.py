@@ -10,12 +10,18 @@ def create(request):
     req_data = json.loads(request.body)
     role = req_data['role']
     name = req_data['name']
+    introduction = req_data['introduction']
     school_uuid = req_data['school_uuid']
     members = req_data['members'] if 'members' in req_data else None
-    classroom_code = ClassroomHelper(user_id, role).create_new_classroom(name, school_uuid, members=members)
+    classroom_helper = ClassroomHelper(user_id, role)
+    result_tup = classroom_helper.create_new_classroom(name, school_uuid, introduction, members=members)
+    classroom_uuid = result_tup[0]
+    classroom_code = result_tup[1]
     res_data = dict(
         error=0,
-        classroom_code=classroom_code
+        classroom_uuid=classroom_uuid,
+        classroom_code=classroom_code,
+        timestamp=classroom_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -29,7 +35,10 @@ def update(request):
     role = req_data['role']
     classroom_uuid = req_data['uuid']
     name = req_data['name'] if 'name' in req_data else None
-    success = ClassroomHelper(user_id, role).update_classroom_info(classroom_uuid, name=name)
+    introduction = req_data['introduction'] if 'introduction' in req_data else None
+    success = ClassroomHelper(user_id, role).update_classroom_info(classroom_uuid,
+                                                                   name=name,
+                                                                   introduction=introduction)
     res_data = dict(
         error=success
     )

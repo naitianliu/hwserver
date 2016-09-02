@@ -38,7 +38,7 @@ class PhoneLoginHelper(object):
         else:
             error_code = 1010
         token = self.user_helper.generate_token(username) if error_code == 0 else None
-        return error_code, token
+        return error_code, token, username
 
     def reset_password(self, code, password):
         if self.verify_code_helper.verify_code(code) == 0:

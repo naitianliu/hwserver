@@ -41,6 +41,21 @@ class SchoolHelper(object):
             ))
         return schools
 
+    def get_school_info_by_uuid(self, school_uuid):
+        try:
+            row = School.objects.get(uuid=school_uuid)
+            info = dict(
+                name=row.name,
+                creator=row.creator,
+                location_x=row.location_x,
+                location_y=row.location_y,
+                address=row.address,
+                active=row.active
+            )
+            return info
+        except School.DoesNotExist:
+            return None
+
     def update_school_info(self, school_uuid, name=None, location_dict=None, address=None):
         try:
             row = School.objects.get(uuid=school_uuid)

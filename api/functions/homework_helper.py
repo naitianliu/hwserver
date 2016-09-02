@@ -1,136 +1,98 @@
-from ots2 import OTSClient, Condition, INF_MIN, INF_MAX
-from hwserver.config import OTS
+from api.models import Homework
+from api.models import Submission
 import uuid
-
-"""
-homework status:
-'open', 'close'
-
-"""
+import json
+import datetime
 
 
 class HomeworkHelper(object):
     def __init__(self, user_id, role):
-        self.ots_client = OTSClient(OTS['instance_endpoint'],
-                                    OTS['access_key_id'],
-                                    OTS['access_key_secret'],
-                                    'homework')
         self.user_id = user_id
         self.role = role
-        self.homework_table = OTS['table']['homework']
-        self.comment_table = OTS['table']['comment']
-        self.student_submission_table = OTS['table']['student_submission']
+        self.timestamp_now = int(datetime.datetime.now().strftime('%s'))
 
-    def create_new_homework(self, classroom_uuid, attrs):
+    def create_new_homework(self, classroom_uuid, info):
         """teacher only"""
-        homework_uuid = str(uuid.uuid1())
-        status = 'open'
-        primary_key = dict(
-            homework_uuid=homework_uuid,
+        homework_uuid = uuid.uuid1()
+        Homework(
+            uuid=homework_uuid,
             classroom_uuid=classroom_uuid,
-            status=status
-        )
-        attribute_columns = attrs
-        condition = Condition('EXPECT_NOT_EXIST')
-        try:
-            self.ots_client.put_row(self.homework_table,
-                                    condition=condition,
-                                    primary_key=primary_key,
-                                    attribute_columns=attribute_columns)
-            return True, homework_uuid
-        except Exception as err:
-            print err
-            return False, None
+            creator=self.user_id,
+            active=True,
+            info=json.dumps(info),
+            created_timestamp=self.timestamp_now,
+            updated_timestamp=self.timestamp_now
+        ).save()
+        return True, homework_uuid
 
-    def submit_homework(self, homework_uuid, attrs):
-        """student only"""
-        primary_key = dict(
+    def submit_homework(self, homework_uuid, info):
+        """
+        student only
+        submission status: 0: initial
+        """
+        submission_uuid = uuid.uuid1()
+        Submission(
+            uuid=submission_uuid,
             homework_uuid=homework_uuid,
-            student_user_id=self.user_id
-        )
-        attribute_columns = attrs
-        condition = Condition('EXPECT_NOT_EXIST')
+            user_id=self.user_id,
+            score=None,
+            status="0",
+            info=json.dumps(info),
+            created_timestamp=self.timestamp_now,
+            updated_timestamp=self.timestamp_now
+        ).save()
+        return True, submission_uuid
+
+    def grade_homework(self, submission_uuid, score):
+        """teacher only"""
         try:
-            self.ots_client.put_row(self.student_submission_table,
-                                    condition=condition,
-                                    primary_key=primary_key,
-                                    attribute_columns=attribute_columns)
+            row = Submission.objects.get(uuid=submission_uuid)
+            row.score = score
+            row.save()
             return True
-        except Exception as err:
-            print err
+        except Submission.DoesNotExist:
             return False
 
-    def grade_homework(self, homework_uuid, student_user_id, score):
+    def close_homework(self, homework_uuid):
         """teacher only"""
-        primary_key = dict(
-            homework_uuid=homework_uuid,
-            student_user_id=student_user_id
-        )
-        update_of_attribute_columns = dict(
-            put=dict(score=score)
-        )
-        condition = Condition('EXPECT_EXIST')
         try:
-            self.ots_client.update_row(self.student_submission_table,
-                                       condition=condition,
-                                       primary_key=primary_key,
-                                       update_of_attribute_columns=update_of_attribute_columns)
+            row = Homework.objects.get(uuid=homework_uuid)
+            row.active = False
+            row.save()
             return True
-        except Exception as err:
-            print err
+        except Homework.DoesNotExist:
             return False
-
-    def close_homework(self, homework_uuid, classroom_uuid):
-        """teacher only"""
-        primary_key = dict(
-            homework_uuid=homework_uuid,
-            classroom_uuid=classroom_uuid,
-            status='open'
-
-        )
-        update_of_attribute_columns = dict(
-            put=dict(status='close')
-        )
-        condition = Condition('EXPECT_EXIST')
-        try:
-            self.ots_client.update_row(self.homework_table,
-                                       condition=condition,
-                                       primary_key=primary_key,
-                                       update_of_attribute_columns=update_of_attribute_columns)
-            return True
-        except Exception as err:
-            print err
-            return False
-
-    def share_to_classroom(self):
-        """teacher only"""
-        pass
 
     def get_homework_list_by_classroom(self, classroom_uuid):
         """T & S"""
-        inclusive_start_primary_key = {
-            'classroom_uuid': classroom_uuid,
-            'homework_uuid': '',
-            'status': ''
-        }
-        exclusive_end_primary_key = {
-            'classroom_uuid': classroom_uuid,
-            'homework_uuid': '',
-            'status': ''
-        }
-        consumed, next_start_primary_key, row_list = self.ots_client.get_range(self.homework_table,
-                                                                               'FORWARD',
-                                                                               inclusive_start_primary_key,
-                                                                               exclusive_end_primary_key)
-        return row_list
+        homework_list = []
+        for row in Homework.objects.filter(classroom_uuid=classroom_uuid, active=True):
+            homework_list.append(dict(
+                uuid=row.uuid,
+                classroom_uuid=row.classroom_uuid,
+                creator=row.creator,
+                active=row.active,
+                info=json.loads(row.info),
+                created_timestamp=row.created_timestamp,
+                updated_timestamp=row.updated_timestamp
+            ))
+        return homework_list
 
-    def add_comment(self):
-        """T & S"""
-        pass
+    def get_submission_list_by_homework(self, homework_uuid):
+        submission_list = []
+        for row in Submission.objects.filter(homework_uuid=homework_uuid):
+            submission_list.append(dict(
+                uuid=row.uuid,
+                homework_uuid=row.homework_uuid,
+                user_id=row.user_id,
+                score=row.score,
+                status=row.status,
+                info=json.loads(row.info),
+                created_timestamp=row.created_timestamp,
+                updated_timestamp=row.updated_timestamp
+            ))
+        return submission_list
 
-    def get_comment_list(self):
-        """T & S"""
-        pass
 
 
 

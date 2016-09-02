@@ -24,3 +24,15 @@ class ProfileHelper(object):
         error_code = 0
         return error_code
 
+    def get_profile(self):
+        try:
+            row = Profile.objects.get(username=self.username)
+            profile_dict = dict(
+                username=self.username,
+                nickname=row.nickname,
+                img_url=row.img_url
+            )
+            return profile_dict
+        except Profile.DoesNotExist:
+            return None
+

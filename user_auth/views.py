@@ -12,11 +12,14 @@ def phone_login(request):
     phone_number = req_data['phone']
     password = req_data['password']
     result_tup = PhoneLoginHelper(phone_number).login(password)
-    print result_tup
     res_data = dict(
         error=result_tup[0],
         token=result_tup[1]
     )
+    username = result_tup[2]
+    profile = ProfileHelper(username).get_profile()
+    if profile:
+        res_data['profile'] = profile
     return Response(data=res_data, status=status.HTTP_200_OK)
 
 

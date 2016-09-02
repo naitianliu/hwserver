@@ -8,7 +8,7 @@ from django.db import models
 class Classroom(models.Model):
     uuid = models.CharField(max_length=50)
     name = models.CharField(max_length=500)
-    description = models.TextField(null=True, blank=True)
+    introduction = models.TextField(null=True, blank=True)
     creator = models.CharField(max_length=200)
     school_uuid = models.CharField(max_length=50)
     code = models.CharField(max_length=20)
@@ -61,5 +61,32 @@ class JoinClassroomRequest(models.Model):
 
     def __unicode__(self):
         return self.requester
+
+
+class Homework(models.Model):
+    uuid = models.CharField(max_length=50)
+    classroom_uuid = models.CharField(max_length=50)
+    creator = models.CharField(max_length=200)
+    info = models.TextField(blank=True)
+    active = models.BooleanField(default=True)
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
+
+    def __unicode__(self):
+        return self.uuid
+
+
+class Submission(models.Model):
+    uuid = models.CharField(max_length=50)
+    homework_uuid = models.CharField(max_length=50)
+    user_id = models.CharField(max_length=200)
+    score = models.CharField(max_length=20, null=True, blank=True)
+    status = models.CharField(max_length=10)
+    info = models.TextField()
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
+
+    def __unicode__(self):
+        return self.uuid
 
 
