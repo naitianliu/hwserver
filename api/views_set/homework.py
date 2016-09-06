@@ -89,7 +89,7 @@ def get_homework_list(request):
     row_list = HomeworkHelper(user_id, role).get_homework_list_by_classroom(classroom_uuid)
     res_data = dict(
         error=0,
-        row_list=row_list
+        homeworks=row_list
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 

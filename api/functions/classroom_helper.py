@@ -8,7 +8,7 @@ import datetime
 
 
 class ClassroomHelper(object):
-    def __init__(self, user_id, role):
+    def __init__(self, user_id=None, role=None):
         self.user_id = user_id
         self.timestamp_now = int(datetime.datetime.now().strftime('%s'))
         self.role = role
@@ -231,3 +231,11 @@ class ClassroomHelper(object):
         length = Classroom.objects.all().count()
         code = base_number + length + 10
         return str(code)
+
+    def get_creator_by_classroom(self, classroom_uuid):
+        try:
+            row = Classroom.objects.get(uuid=classroom_uuid)
+            creator = row.creator
+            return creator
+        except Classroom.DoesNotExist:
+            return None

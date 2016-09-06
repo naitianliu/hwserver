@@ -1,5 +1,6 @@
 from api.views_set.lib import *
 from api.functions.classroom_helper import ClassroomHelper
+from api.functions.update_helper import UpdateHelper
 
 
 @api_view(['POST'])
@@ -98,7 +99,12 @@ def send_request_to_join(request):
     role = req_data['role']
     classroom_uuid = req_data['uuid']
     comment = req_data['comment'] if 'comment' in req_data else None
-    request_uuid = ClassroomHelper(user_id, role).send_request_to_join(classroom_uuid, comment=comment)
+    classroom_helper = ClassroomHelper(user_id, role)
+    request_uuid = classroom_helper.send_request_to_join(classroom_uuid, comment=comment)
+    # update cache
+    UpdateHelper(user_id, role, timestamp=classroom_helper.timestamp_now).new_pending_request(user_id,
+                                                                                              classroom_uuid,
+                                                                                              request_uuid)
     res_data = dict(
         error=0,
         request_uuid=request_uuid

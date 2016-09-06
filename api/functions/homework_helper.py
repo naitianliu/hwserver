@@ -68,7 +68,7 @@ class HomeworkHelper(object):
         homework_list = []
         for row in Homework.objects.filter(classroom_uuid=classroom_uuid, active=True):
             homework_list.append(dict(
-                uuid=row.uuid,
+                homework_uuid=row.uuid,
                 classroom_uuid=row.classroom_uuid,
                 creator=row.creator,
                 active=row.active,
@@ -82,7 +82,7 @@ class HomeworkHelper(object):
         submission_list = []
         for row in Submission.objects.filter(homework_uuid=homework_uuid):
             submission_list.append(dict(
-                uuid=row.uuid,
+                submission_uuid=row.uuid,
                 homework_uuid=row.homework_uuid,
                 user_id=row.user_id,
                 score=row.score,

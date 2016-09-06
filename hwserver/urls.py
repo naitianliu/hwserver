@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^api/v1/school/', include('api.urls_set.school')),
     url(r'^api/v1/classroom/', include('api.urls_set.classroom')),
     url(r'^api/v1/homework/', include('api.urls_set.homework')),
+    url(r'^api/v1/updates/', include('api.urls_set.updates')),
 
 ]
