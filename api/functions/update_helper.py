@@ -24,10 +24,10 @@ class UpdateHelper(object):
             requester_profile=requester_profile_info,
             classroom_uuid=classroom_uuid,
             request_uuid=request_uuid,
+            requester_role=self.role,
             timestamp=self.timestamp
         )
         key = self.__get_key(creator_user_id, 't', UPDATE_KEY_TYPES[0])
-        print key
         current_requests = self.__read_from_cache(key)
         if current_requests:
             current_requests.append(item_dict)
@@ -35,7 +35,7 @@ class UpdateHelper(object):
             current_requests = [item_dict]
         self.__write_to_cache(key, current_requests)
 
-    def request_approval(self, profile_info, approver):
+    def request_approval(self, approver_profile_info, approver):
         """T & S"""
         pass
 

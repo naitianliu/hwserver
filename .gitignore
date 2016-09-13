@@ -103,6 +103,7 @@ pip-selfcheck.json
 
 # Created by .ignore support plugin (hsz.mobi)
 
+support_files
 hwserver/config.py
 .idea/workspace.xml
 db.sqlite3
@@ -111,3 +112,13 @@ user_auth/migrations/0001_initial.py
 user_auth/migrations/0002_auto_20160703_0427.py
 user_auth/migrations/0003_auto_20160706_0716.py
 user_auth/vendors/top/
+api/migrations/0001_initial.py
+api/migrations/0002_auto_20160821_2028.py
+api/migrations/0003_auto_20160821_2326.py
+api/migrations/0004_joinclassroomrequest.py
+api/migrations/0005_auto_20160822_0430.py
+api/migrations/0006_auto_20160824_2205.py
+api/migrations/0007_classroom_introduction.py
+api/migrations/0008_homework_submission.py
+api/migrations/0009_comment.py
+user_auth/migrations/0004_auto_20160912_0026.py

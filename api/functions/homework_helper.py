@@ -84,7 +84,7 @@ class HomeworkHelper(object):
             submission_list.append(dict(
                 submission_uuid=row.uuid,
                 homework_uuid=row.homework_uuid,
-                user_id=row.user_id,
+                submitter=row.user_id,
                 score=row.score,
                 status=row.status,
                 info=json.loads(row.info),

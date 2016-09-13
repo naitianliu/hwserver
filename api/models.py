@@ -90,3 +90,12 @@ class Submission(models.Model):
         return self.uuid
 
 
+class Comment(models.Model):
+    uuid = models.CharField(max_length=50)
+    submission_uuid = models.CharField(max_length=50)
+    author = models.CharField(max_length=200)
+    info = models.TextField()
+    created_timestamp = models.IntegerField()
+
+    def __unicode__(self):
+        return self.uuid

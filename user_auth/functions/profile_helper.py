@@ -17,7 +17,7 @@ class ProfileHelper(object):
             row.save()
         except Profile.DoesNotExist:
             Profile(
-                username=self.username,
+                user_id=self.username,
                 nickname=nickname,
                 img_url=img_url
             ).save()
@@ -28,7 +28,7 @@ class ProfileHelper(object):
         try:
             row = Profile.objects.get(username=self.username)
             profile_dict = dict(
-                username=self.username,
+                user_id=self.username,
                 nickname=row.nickname,
                 img_url=row.img_url
             )

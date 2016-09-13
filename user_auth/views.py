@@ -2,6 +2,10 @@ from api.views_set.lib import *
 from user_auth.functions.verification_code_helper import VerificationCodeHelper
 from user_auth.functions.phone_login_helper import PhoneLoginHelper
 from user_auth.functions.profile_helper import ProfileHelper
+from user_auth.functions.vendor_login import VendorLogin
+from user_auth.functions.invitation_helper import InvitationHelper
+from user_auth.functions.bind_account_helper import BindAccountHelper
+from user_auth.functions.device_token_helper import DeviceTokenHelper
 
 # Create your views here.
 
@@ -83,4 +87,60 @@ def user_profile_update(request):
     img_url = req_data['img_url'] if 'img_url' in req_data else None
     error_code = ProfileHelper(username).update_profile(nickname=nickname, img_url=img_url)
     res_data = dict(error=error_code)
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def wechat_login(request):
+    req_data = json.loads(request.body)
+    uid = req_data['uid']
+    nickname = req_data['nickname']
+    img_url = req_data['img_url']
+    username, token, active = VendorLogin().wechat_login(uid, nickname, img_url)
+    res_data = dict(
+        error=0,
+        username=username,
+        token=token,
+        active=active
+    )
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def generate_invitation_code(request):
+    code = InvitationHelper().generate_invitation_code()
+    res_data = dict(
+        error=0,
+        code=code
+    )
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def validate_invitation_code(request):
+    req_data = json.loads(request.body)
+    code = req_data['code']
+    uid = req_data['uid']
+    username = req_data['username']
+    result = InvitationHelper().validate_invitation_code(str(code).strip())
+    if result:
+        BindAccountHelper().activate_account(username, "wechat", uid)
+    res_data = dict(
+        error=0,
+        valid=result
+    )
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@authentication_classes((BasicAuthentication, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def update_device_token(request):
+    username = request.user.username
+    req_data = json.loads(request.body)
+    device_token = req_data['device_token']
+    DeviceTokenHelper(username).add_update_device_token(device_token)
+    res_data = dict(
+        error=0
+    )
     return Response(data=res_data, status=status.HTTP_200_OK)

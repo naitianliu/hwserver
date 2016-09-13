@@ -19,7 +19,7 @@ class PhoneLoginHelper(object):
         else:
             error_code = 1051
         if error_code == 0:
-            username = self.user_helper.generate_username(self.phone_number, 'phone')
+            username = self.user_helper.generate_username()
             print username
             self.user_helper.register(username, password)
             self.bind_account_helper.bind_new_account(username, 'phone', self.phone_number)

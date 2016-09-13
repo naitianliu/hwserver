@@ -104,6 +104,6 @@ def get_submission_list(request):
     row_list = HomeworkHelper(user_id, role).get_submission_list_by_homework(homework_uuid)
     res_data = dict(
         error=0,
-        row_list=row_list
+        submissions=row_list
     )
     return Response(data=res_data, status=status.HTTP_200_OK)

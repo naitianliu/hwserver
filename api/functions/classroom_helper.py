@@ -175,7 +175,7 @@ class ClassroomHelper(object):
             school_info = school_helper.get_school_info_by_uuid(school_uuid)
             classrooms.append(dict(
                 classroom_uuid=classroom_uuid,
-                name=row.name,
+                classroom_name=row.name,
                 introduction=row.introduction,
                 creator=row.creator,
                 active=row.active,

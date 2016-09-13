@@ -21,7 +21,7 @@ def create(request):
     res_data = dict(
         error=0,
         classroom_uuid=classroom_uuid,
-        classroom_code=classroom_code,
+        code=classroom_code,
         timestamp=classroom_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
@@ -34,8 +34,8 @@ def update(request):
     user_id = request.user.username
     req_data = json.loads(request.body)
     role = req_data['role']
-    classroom_uuid = req_data['uuid']
-    name = req_data['name'] if 'name' in req_data else None
+    classroom_uuid = req_data['classroom_uuid']
+    name = req_data['classroom_name'] if 'classroom_name' in req_data else None
     introduction = req_data['introduction'] if 'introduction' in req_data else None
     success = ClassroomHelper(user_id, role).update_classroom_info(classroom_uuid,
                                                                    name=name,
@@ -56,7 +56,7 @@ def close(request):
     classroom_uuid = req_data['uuid']
     success = ClassroomHelper(user_id, role).close_classroom(classroom_uuid)
     res_data = dict(
-        error=success
+        success=success
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -97,7 +97,7 @@ def send_request_to_join(request):
     user_id = request.user.username
     req_data = json.loads(request.body)
     role = req_data['role']
-    classroom_uuid = req_data['uuid']
+    classroom_uuid = req_data['classroom_uuid']
     comment = req_data['comment'] if 'comment' in req_data else None
     classroom_helper = ClassroomHelper(user_id, role)
     request_uuid = classroom_helper.send_request_to_join(classroom_uuid, comment=comment)
@@ -122,6 +122,6 @@ def approve_request(request):
     request_uuid = req_data['request_uuid']
     success = ClassroomHelper(user_id, role).approve_request(request_uuid)
     res_data = dict(
-        error=success
+        success=success
     )
     return Response(data=res_data, status=status.HTTP_200_OK)

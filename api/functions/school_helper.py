@@ -45,7 +45,7 @@ class SchoolHelper(object):
         try:
             row = School.objects.get(uuid=school_uuid)
             info = dict(
-                name=row.name,
+                school_name=row.name,
                 creator=row.creator,
                 location_x=row.location_x,
                 location_y=row.location_y,

@@ -37,3 +37,7 @@ OTS = {
         'student_submission': 'student_submission_table'
     }
 }
+
+REDIS = {
+    'password': 'Usdeki365UYH'
+}

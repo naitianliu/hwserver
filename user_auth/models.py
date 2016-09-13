@@ -6,7 +6,7 @@ from django.db import models
 
 
 class VerificationCode(models.Model):
-    phone_number = models.CharField(max_length=30)
+    phone_number = models.CharField(max_length=50)
     code = models.CharField(max_length=10)
     created_time = models.IntegerField()
 
@@ -24,6 +24,16 @@ class Profile(models.Model):
 
 
 class BindAccount(models.Model):
-    username = models.CharField(max_length=30)
+    username = models.CharField(max_length=50)
     type = models.CharField(max_length=20)
     value = models.CharField(max_length=50)
+    active = models.BooleanField(default=False)
+
+
+class DeviceToken(models.Model):
+    username = models.CharField(max_length=200)
+    token = models.CharField(max_length=200)
+    updated_time = models.IntegerField()
+
+    def __unicode__(self):
+        return self.username
