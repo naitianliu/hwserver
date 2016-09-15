@@ -17,7 +17,7 @@ class ProfileHelper(object):
             row.save()
         except Profile.DoesNotExist:
             Profile(
-                user_id=self.username,
+                username=self.username,
                 nickname=nickname,
                 img_url=img_url
             ).save()
