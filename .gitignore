@@ -122,3 +122,4 @@ api/migrations/0007_classroom_introduction.py
 api/migrations/0008_homework_submission.py
 api/migrations/0009_comment.py
 user_auth/migrations/0004_auto_20160912_0026.py
+user_auth/migrations/0005_devicetoken.py
