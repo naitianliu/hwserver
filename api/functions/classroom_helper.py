@@ -77,6 +77,13 @@ class ClassroomHelper(object):
         classrooms = self.__get_classroom_info_list_by_uuid_list(classroom_uuid_list)
         return classrooms
 
+    def get_classroom_info(self, classroom_uuid):
+        classrooms = self.__get_classroom_info_list_by_uuid_list([classroom_uuid])
+        if classrooms:
+            return classrooms[0]
+        else:
+            return None
+
     def invite_people_to_join_classroom(self):
         """teacher only"""
         pass
@@ -109,6 +116,7 @@ class ClassroomHelper(object):
         """teacher only"""
         try:
             row = JoinClassroomRequest.objects.get(uuid=request_uuid)
+            requester = row.requester
             row.status = "approved"
             row.approver = self.user_id
             row.updated_timestamp = self.timestamp_now
@@ -121,9 +129,9 @@ class ClassroomHelper(object):
                 user_id=requester_user_id
             )]
             self.__add_members(classroom_uuid, members)
-            return True
+            return True, requester, role, classroom_uuid
         except JoinClassroomRequest.DoesNotExist:
-            return False
+            return False, None, None, None
 
     def get_pending_requests(self):
         classroom_uuid_list = self.__get_classroom_uuid_list()

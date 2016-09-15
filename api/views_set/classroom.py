@@ -120,7 +120,9 @@ def approve_request(request):
     req_data = json.loads(request.body)
     role = req_data['role']
     request_uuid = req_data['request_uuid']
-    success = ClassroomHelper(user_id, role).approve_request(request_uuid)
+    success, requester_user_id, requester_role, classroom_uuid = ClassroomHelper(user_id, role).approve_request(request_uuid)
+    # update cache
+    UpdateHelper(user_id, role).request_approved(requester_user_id, requester_role, classroom_uuid)
     res_data = dict(
         success=success
     )

@@ -1,9 +1,11 @@
 from django.core.cache import cache
 from user_auth.functions.profile_helper import ProfileHelper
 from api.functions.classroom_helper import ClassroomHelper
+from api.notification.apns_helper import APNSHelper
+from api.notification.message_template import MESSAGE
 import datetime
 
-UPDATE_KEY_TYPES = ['requests', 'submissions', 'members', 'classrooms', 'homeworks']
+UPDATE_KEY_TYPES = ['requests', 'approvals' 'submissions', 'members', 'classrooms', 'homeworks']
 REDIS_TIMEOUT = 7*24*60*60
 
 
@@ -28,16 +30,26 @@ class UpdateHelper(object):
             timestamp=self.timestamp
         )
         key = self.__get_key(creator_user_id, 't', UPDATE_KEY_TYPES[0])
-        current_requests = self.__read_from_cache(key)
-        if current_requests:
-            current_requests.append(item_dict)
-        else:
-            current_requests = [item_dict]
-        self.__write_to_cache(key, current_requests)
+        self.__update_value(key, item_dict)
+        # send message
+        message = MESSAGE['requests'].format(requester_profile_info['nickname'])
+        APNSHelper(creator_user_id).send_simple_notification(message)
 
-    def request_approval(self, approver_profile_info, approver):
+    def request_approved(self, requester_user_id, requester_role, classroom_uuid):
         """T & S"""
-        pass
+        approver = self.user_id
+        approver_profile_info = ProfileHelper(approver).get_profile()
+        classroom_info = ClassroomHelper(user_id=requester_user_id, role=requester_role).get_classroom_info(classroom_uuid)
+        item_dict = dict(
+            approver_profile_info=approver_profile_info,
+            classroom_info=classroom_info,
+            timestamp=self.timestamp
+        )
+        key = self.__get_key(requester_user_id, requester_role, UPDATE_KEY_TYPES[1])
+        self.__update_value(key, item_dict)
+        # send message
+        message = MESSAGE['approvals'].format(classroom_info['classroom_name'])
+        APNSHelper(requester_user_id).send_simple_notification(message)
 
     def member_added_into_classroom(self, profile_info, classroom_info=None):
         """T & S"""
@@ -66,6 +78,14 @@ class UpdateHelper(object):
             updates[key_type] = value
             self.__delete_from_cache(key)
         return updates
+
+    def __update_value(self, key, item_dict):
+        current_values = self.__read_from_cache(key)
+        if current_values:
+            current_values.append(item_dict)
+        else:
+            current_values = [item_dict]
+        self.__write_to_cache(key, current_values)
 
     def __read_from_cache(self, key):
         value = cache.get(key)

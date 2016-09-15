@@ -8,6 +8,3 @@ from api.functions.homework_helper import HomeworkHelper
 class AliyunTest(TestCase):
     def test_get_sts_token(self):
         print AliyunHelper().get_sts_token()
-
-    def test_ots(self):
-        HomeworkHelper().list_table()

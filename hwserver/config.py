@@ -1,3 +1,4 @@
+# coding=utf-8
 from hwserver.settings import PROD
 
 if PROD:
@@ -20,7 +21,7 @@ VENDORS = {
     'alidayu': {
         'url': 'http://gw.api.taobao.com/router/rest',
         'sms_type': 'normal',
-        'sms_free_sign_name': '\xE7\xAA\x97\xE5\xA4\x96',
+        'sms_free_sign_name': '窗外',
         'sms_template_code': 'SMS_10880721',
         'app_key': '23391266',
         'app_secret': '07a28ef99101a18e06efdc8532d12ec4',
@@ -39,5 +40,12 @@ OTS = {
 }
 
 REDIS = {
-    'password': 'Usdeki365UYH'
+    'host': 'redis://Usdeki365UYH@8236a7b263d24af3.redis.rds.aliyuncs.com:6379/1',
+}
+
+MYSQL = {
+    'host': 'rm-uf6xhbr4bwcvq6m84.mysql.rds.aliyuncs.com',
+    'port': '3306',
+    'username': 'hw_mysql_user',
+    'password': 'wsui123@1*!l'
 }

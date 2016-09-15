@@ -6,6 +6,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="api.models.__future__" />
+          <option value="sys.setdefaultencoding" />
         </list>
       </option>
     </inspection_tool>
