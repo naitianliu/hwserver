@@ -5,7 +5,7 @@ from api.notification.apns_helper import APNSHelper
 from api.notification.message_template import MESSAGE
 import datetime
 
-UPDATE_KEY_TYPES = ['requests', 'approvals' 'submissions', 'members', 'classrooms', 'homeworks']
+UPDATE_KEY_TYPES = ['requests', 'approvals', 'submissions', 'members', 'classrooms', 'homeworks']
 REDIS_TIMEOUT = 7*24*60*60
 
 
