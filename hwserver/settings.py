@@ -84,6 +84,9 @@ WSGI_APPLICATION = 'hwserver.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 from hwserver.config import MYSQL as MYSQL_CONFIG
 
+import codecs
+codecs.register(lambda name: codecs.lookup('utf8') if name == 'utf8mb4' else None)
+
 if PROD:
     DATABASES = {
         'default': {
