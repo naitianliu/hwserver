@@ -40,7 +40,7 @@ OTS = {
 }
 
 REDIS = {
-    'host': 'redis://Usdeki365UYH@8236a7b263d24af3.redis.rds.aliyuncs.com:6379/0',
+    'host': 'redis://:Usdeki365UYH@8236a7b263d24af3.redis.rds.aliyuncs.com:6379/0',
 }
 
 MYSQL = {
