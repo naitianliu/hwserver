@@ -92,7 +92,8 @@ if PROD:
             'USER': MYSQL_CONFIG['username'],
             'PASSWORD': MYSQL_CONFIG['password'],
             'HOST': MYSQL_CONFIG['host'],
-            'PORT': MYSQL_CONFIG['port']
+            'PORT': MYSQL_CONFIG['port'],
+            'OPTIONS': {'charset': 'utf8mb4'},
         }
     }
 else:
