@@ -84,6 +84,22 @@ class ClassroomHelper(object):
         else:
             return None
 
+    def get_school_uuid_by_classroom_uuid(self, classroom_uuid):
+        try:
+            row = Classroom.objects.get(uuid=classroom_uuid)
+            school_uuid = row.school_uuid
+            return school_uuid
+        except Classroom.DoesNotExist:
+            return None
+
+    def get_classroom_name_by_uuid(self, classroom_uuid):
+        try:
+            row = Classroom.objects.get(uuid=classroom_uuid)
+            classroom_name = row.name
+            return classroom_name
+        except Classroom.DoesNotExist:
+            return None
+
     def invite_people_to_join_classroom(self):
         """teacher only"""
         pass
@@ -94,12 +110,13 @@ class ClassroomHelper(object):
 
     def send_request_to_join(self, classroom_uuid, comment=None):
         """T & S"""
-        request_uuid = uuid.uuid1()
+
         rows = JoinClassroomRequest.objects.filter(classroom_uuid=classroom_uuid,
                                                    requester=self.user_id,
                                                    role=self.role,
                                                    status="pending")
         if len(rows) == 0:
+            request_uuid = uuid.uuid1()
             JoinClassroomRequest(
                 uuid=request_uuid,
                 classroom_uuid=classroom_uuid,
@@ -110,6 +127,9 @@ class ClassroomHelper(object):
                 created_timestamp=self.timestamp_now,
                 updated_timestamp=self.timestamp_now
             ).save()
+        else:
+            item = rows[0]
+            request_uuid = item.uuid
         return request_uuid
 
     def approve_request(self, request_uuid):
@@ -168,7 +188,7 @@ class ClassroomHelper(object):
 
     def __get_classroom_uuid_list(self):
         classroom_uuid_list = []
-        for row in ClassroomMember.objects.filter(user_id=self.user_id, role=self.role):
+        for row in ClassroomMember.objects.filter(user_id=self.user_id, role=self.role, active=True):
             classroom_uuid = row.classroom_uuid
             classroom_uuid_list.append(classroom_uuid)
         return classroom_uuid_list
@@ -198,7 +218,7 @@ class ClassroomHelper(object):
 
     def __get_members_dict(self, classroom_uuid_list):
         members_dict = dict()
-        for row in ClassroomMember.objects.filter(classroom_uuid__in=classroom_uuid_list):
+        for row in ClassroomMember.objects.filter(classroom_uuid__in=classroom_uuid_list, active=True):
             classroom_uuid = row.classroom_uuid
             if classroom_uuid not in members_dict:
                 members_dict[classroom_uuid] = []
@@ -211,20 +231,32 @@ class ClassroomHelper(object):
             ))
         return members_dict
 
+    def __get_members_by_classroom(self, classroom_uuid):
+        members = []
+        for row in ClassroomMember.objects.filter(classroom_uuid=classroom_uuid, active=True):
+            members.append(dict(
+                role=row.role,
+                user_id=row.user_id
+            ))
+        return members
+
     def __add_members(self, classroom_uuid, members):
-        print members
+        old_members = self.__get_members_by_classroom(classroom_uuid)
+        print old_members
         for member in members:
             role = member['role']
             user_id = member['user_id']
-            try:
-                row = ClassroomMember.objects.get(classroom_uuid=classroom_uuid,
+
+            rows = ClassroomMember.objects.filter(classroom_uuid=classroom_uuid,
                                                   user_id=user_id,
                                                   role=role)
-                if not row.active:
-                    row.active = True
-                    row.updated_timestamp = self.timestamp_now
-                    row.save()
-            except ClassroomMember.DoesNotExist:
+            if len(rows) > 0:
+                for row in rows:
+                    if not row.active:
+                        row.active = True
+                        row.updated_timestamp = self.timestamp_now
+                        row.save()
+            else:
                 ClassroomMember(
                     classroom_uuid=classroom_uuid,
                     user_id=user_id,
@@ -233,6 +265,15 @@ class ClassroomHelper(object):
                     created_timestamp=self.timestamp_now,
                     updated_timestamp=self.timestamp_now
                 ).save()
+        for old_member in old_members:
+            print 123
+            if old_member not in members:
+                role = old_member['role']
+                user_id = old_member['user_id']
+                rows = ClassroomMember.objects.filter(classroom_uuid=classroom_uuid, user_id=user_id, role=role, active=True)
+                for row in rows:
+                    row.active = False
+                    row.save()
 
     def __generate_code_string(self):
         base_number = 1119

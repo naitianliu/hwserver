@@ -48,7 +48,9 @@ class UpdateHelper(object):
         key = self.__get_key(requester_user_id, requester_role, UPDATE_KEY_TYPES[1])
         self.__update_value(key, item_dict)
         # send message
-        message = MESSAGE['approvals'].format(classroom_info['classroom_name'])
+        classroom_name = classroom_info['classroom_name'] if 'classroom_name' in classroom_info else ""
+        print classroom_name
+        message = MESSAGE['approvals'].format(classroom_name)
         APNSHelper(requester_user_id).send_simple_notification(message)
 
     def member_added_into_classroom(self, profile_info, classroom_info=None):

@@ -37,9 +37,11 @@ def update(request):
     classroom_uuid = req_data['classroom_uuid']
     name = req_data['classroom_name'] if 'classroom_name' in req_data else None
     introduction = req_data['introduction'] if 'introduction' in req_data else None
+    members = req_data['members'] if 'members' in req_data else None
     success = ClassroomHelper(user_id, role).update_classroom_info(classroom_uuid,
                                                                    name=name,
-                                                                   introduction=introduction)
+                                                                   introduction=introduction,
+                                                                   members=members)
     res_data = dict(
         error=success
     )
@@ -120,6 +122,7 @@ def approve_request(request):
     req_data = json.loads(request.body)
     role = req_data['role']
     request_uuid = req_data['request_uuid']
+    print request_uuid
     success, requester_user_id, requester_role, classroom_uuid = ClassroomHelper(user_id, role).approve_request(request_uuid)
     # update cache
     UpdateHelper(user_id, role).request_approved(requester_user_id, requester_role, classroom_uuid)

@@ -36,3 +36,11 @@ class ProfileHelper(object):
         except Profile.DoesNotExist:
             return None
 
+    def get_nickname_by_username(self, username):
+        try:
+            row = Profile.objects.get(username=username)
+            nickname = row.nickname
+            return nickname
+        except Profile.DoesNotExist:
+            return None
+

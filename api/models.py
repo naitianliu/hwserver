@@ -99,3 +99,35 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return self.uuid
+
+
+class Question(models.Model):
+    uuid = models.CharField(max_length=50)
+    classroom_uuid = models.CharField(max_length=50)
+    school_uuid = models.CharField(max_length=50, null=True)
+    creator = models.CharField(max_length=200)
+    role = models.CharField(max_length=10)
+    anonymous = models.BooleanField()
+    answer_count = models.IntegerField()
+    content = models.TextField()
+    created_timestamp = models.IntegerField()
+    updated_timestamp = models.IntegerField()
+
+    def __unicode__(self):
+        return self.content
+
+
+class Answer(models.Model):
+    uuid = models.CharField(max_length=50)
+    question_uuid = models.CharField(max_length=50)
+    classroom_uuid = models.CharField(max_length=50)
+    creator = models.CharField(max_length=200)
+    role = models.CharField(max_length=10)
+    anonymous = models.BooleanField()
+    content = models.TextField()
+    agree_count = models.IntegerField()
+    disagree_count = models.IntegerField()
+    created_timestamp = models.IntegerField()
+
+    def __unicode__(self):
+        return self.content

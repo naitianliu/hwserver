@@ -32,4 +32,6 @@ urlpatterns = [
     url(r'^api/v1/comment/', include('api.urls_set.comment')),
     url(r'^api/v1/updates/', include('api.urls_set.updates')),
 
+    url(r'^api/v1/qa/', include('api.urls_set.qa')),
+
 ]
