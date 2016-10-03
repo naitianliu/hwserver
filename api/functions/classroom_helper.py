@@ -35,8 +35,13 @@ class ClassroomHelper(object):
             created_timestamp=self.timestamp_now,
             updated_timestamp=self.timestamp_now
         ).save()
-        if members:
-            self.__add_members(classroom_uuid, members)
+        creator_info = {"user_id": self.user_id, "role": "t"}
+        if not members:
+            members = [creator_info]
+        else:
+            if creator_info not in members:
+                members.append(creator_info)
+        self.__add_members(classroom_uuid, members)
         return classroom_uuid, code
 
     def update_classroom_info(self, classroom_uuid, name=None, introduction=None, members=None):
@@ -70,6 +75,12 @@ class ClassroomHelper(object):
                 return False
         except Classroom.DoesNotExist:
             return False
+
+    def close_classrooms_by_school(self, school_uuid):
+        for row in Classroom.objects.filter(school_uuid=school_uuid, active=True):
+            row.active = False
+            row.updated_timestamp = self.timestamp_now
+            row.save()
 
     def get_classroom_list(self):
         """T & S"""
@@ -144,10 +155,13 @@ class ClassroomHelper(object):
             classroom_uuid = row.classroom_uuid
             role = row.role
             requester_user_id = row.requester
-            members = [dict(
+            member_info = dict(
                 role=role,
                 user_id=requester_user_id
-            )]
+            )
+            members = self.__get_members_by_classroom(classroom_uuid)
+            if member_info not in members:
+                members.append(member_info)
             self.__add_members(classroom_uuid, members)
             return True, requester, role, classroom_uuid
         except JoinClassroomRequest.DoesNotExist:
@@ -243,6 +257,7 @@ class ClassroomHelper(object):
     def __add_members(self, classroom_uuid, members):
         old_members = self.__get_members_by_classroom(classroom_uuid)
         print old_members
+        print members
         for member in members:
             role = member['role']
             user_id = member['user_id']

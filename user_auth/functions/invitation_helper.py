@@ -23,14 +23,17 @@ class InvitationHelper(object):
 
     def validate_invitation_code(self, code_str):
         code_list = self.__read_from_cache(KEY)
-        result = code_str in code_list
-        if result:
-            for i in range(len(code_list)):
-                if code_str == code_list[i]:
-                    code_list.pop(i)
-                    self.__write_to_cache(KEY, code_list)
-                    break
-        return result
+        if code_list:
+            result = code_str in code_list
+            if result:
+                for i in range(len(code_list)):
+                    if code_str == code_list[i]:
+                        code_list.pop(i)
+                        self.__write_to_cache(KEY, code_list)
+                        break
+            return result
+        else:
+            return False
 
     def __read_from_cache(self, key):
         value = cache.get(key)

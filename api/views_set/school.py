@@ -1,5 +1,6 @@
 from api.views_set.lib import *
 from api.functions.school_helper import SchoolHelper
+from api.functions.classroom_helper import ClassroomHelper
 
 
 @api_view(['POST'])
@@ -63,11 +64,13 @@ def school_update(request):
 def school_close(request):
     user_id = request.user.username
     req_data = json.loads(request.body)
-    school_uuid = req_data['uuid']
+    school_uuid = req_data['school_uuid']
     school_helper = SchoolHelper(user_id)
     success = school_helper.close_school(school_uuid)
+    if success:
+        ClassroomHelper(user_id=user_id).close_classrooms_by_school(school_uuid)
     res_data = dict(
-        error=success,
+        success=success,
         timestamp=school_helper.timestamp_now
     )
     return Response(data=res_data, status=status.HTTP_200_OK)

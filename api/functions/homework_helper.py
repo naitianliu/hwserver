@@ -81,17 +81,29 @@ class HomeworkHelper(object):
     def get_submission_list_by_homework(self, homework_uuid):
         submission_list = []
         for row in Submission.objects.filter(homework_uuid=homework_uuid):
-            submission_list.append(dict(
-                submission_uuid=row.uuid,
-                homework_uuid=row.homework_uuid,
-                submitter=row.user_id,
-                score=row.score,
-                status=row.status,
-                info=json.loads(row.info),
-                created_timestamp=row.created_timestamp,
-                updated_timestamp=row.updated_timestamp
-            ))
+            submission_list.append(self.__get_submission_row_dict(row))
         return submission_list
+
+    def get_submission_info(self, submission_uuid):
+        try:
+            row = Submission.objects.get(uuid=submission_uuid)
+            info = self.__get_submission_row_dict(row)
+            return info
+        except Submission.DoesNotExist:
+            return None
+
+    def __get_submission_row_dict(self, row):
+        row_dict = dict(
+            submission_uuid=row.uuid,
+            homework_uuid=row.homework_uuid,
+            submitter=row.user_id,
+            score=row.score,
+            status=row.status,
+            info=json.loads(row.info),
+            created_timestamp=row.created_timestamp,
+            updated_timestamp=row.updated_timestamp
+        )
+        return row_dict
 
 
 

@@ -1,5 +1,6 @@
 from api.views_set.lib import *
 from api.functions.homework_helper import HomeworkHelper
+from api.functions.comment_helper import CommentHelper
 
 
 @api_view(['POST'])
@@ -105,5 +106,22 @@ def get_submission_list(request):
     res_data = dict(
         error=0,
         submissions=row_list
+    )
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes((BasicAuthentication, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def get_submission_info(request):
+    user_id = request.user.username
+    role = request.GET['role']
+    submission_uuid = request.GET['submission_uuid']
+    info = HomeworkHelper(user_id, role).get_submission_info(submission_uuid)
+    comments = CommentHelper(user_id, role).get_list(submission_uuid)
+    res_data = dict(
+        error=0,
+        submission=info,
+        comments=comments
     )
     return Response(data=res_data, status=status.HTTP_200_OK)

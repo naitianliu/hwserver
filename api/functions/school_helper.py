@@ -50,7 +50,8 @@ class SchoolHelper(object):
                 location_x=row.location_x,
                 location_y=row.location_y,
                 address=row.address,
-                active=row.active
+                active=row.active,
+                created_timestamp=row.created_timestamp
             )
             return info
         except School.DoesNotExist:
@@ -77,9 +78,12 @@ class SchoolHelper(object):
     def close_school(self, school_uuid):
         try:
             row = School.objects.get(uuid=school_uuid)
-            row.active = False
-            row.updated_timestamp = self.timestamp_now
-            row.save()
-            return True
+            if row.creator == self.user_id:
+                row.active = False
+                row.updated_timestamp = self.timestamp_now
+                row.save()
+                return True
+            else:
+                return False
         except School.DoesNotExist:
             return False

@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^close/', close),
     url(r'^get_homework_list/', get_homework_list),
     url(r'^get_submission_list/', get_submission_list),
+    url(r'^get_submission_info/', get_submission_info),
 ]

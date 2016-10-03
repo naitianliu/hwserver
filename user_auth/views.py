@@ -69,7 +69,6 @@ def phone_register(request):
     code = req_data['code']
     password = req_data['password']
     result_tup = PhoneLoginHelper(phone_number).register(code, password)
-    print result_tup
     res_data = dict(
         error=result_tup[0],
         token=result_tup[1]
@@ -120,10 +119,11 @@ def generate_invitation_code(request):
 def validate_invitation_code(request):
     req_data = json.loads(request.body)
     code = req_data['code']
-    uid = req_data['uid']
-    username = req_data['username']
+    uid = req_data['uid'] if 'uid' in req_data else None
+    username = req_data['username'] if 'username' in req_data else None
+    vendor = req_data['vendor'] if 'vendor' in req_data else None
     result = InvitationHelper().validate_invitation_code(str(code).strip())
-    if result:
+    if result and vendor == 'wechat':
         BindAccountHelper().activate_account(username, "wechat", uid)
     res_data = dict(
         error=0,
