@@ -67,13 +67,13 @@ class QAHelper(object):
     def get_question_list(self, filter_type, page_number, school_uuid, per_page=20):
         questions = []
         if filter_type == 'new':
-            p = Paginator(Question.objects.filter(school_uuid=school_uuid).order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter().order_by('-updated_timestamp'), per_page)
         elif filter_type == 'popular':
-            p = Paginator(Question.objects.filter(school_uuid=school_uuid).order_by('-answer_count', '-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter().order_by('-answer_count', '-updated_timestamp'), per_page)
         elif filter_type == 'me':
-            p = Paginator(Question.objects.filter(school_uuid=school_uuid, creator=self.user_id).order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter(creator=self.user_id).order_by('-updated_timestamp'), per_page)
         else:
-            p = Paginator(Question.objects.filter(school_uuid=school_uuid).order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter().order_by('-updated_timestamp'), per_page)
         num_pages = p.num_pages
         if page_number <= num_pages:
             page_objects = p.page(page_number).object_list
