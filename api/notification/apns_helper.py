@@ -1,5 +1,6 @@
 from apns import APNs, Payload
 from hwserver.settings import BASE_DIR
+from hwserver.settings import PROD
 from user_auth.functions.device_token_helper import DeviceTokenHelper
 
 
@@ -11,7 +12,8 @@ class APNSHelper(object):
 
     def send_simple_notification(self, message):
         if self.device_token:
-            apns = APNs(use_sandbox=False, cert_file=self.cert_path, key_file=self.key_path)
+            print self.device_token
+            apns = APNs(use_sandbox=not PROD, cert_file=self.cert_path, key_file=self.key_path)
             payload = Payload(alert=message, sound="default", badge=1)
             apns.gateway_server.send_notification(self.device_token, payload)
             apns.gateway_server.register_response_listener(self.__response_listener)

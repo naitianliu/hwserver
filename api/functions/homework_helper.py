@@ -6,7 +6,7 @@ import datetime
 
 
 class HomeworkHelper(object):
-    def __init__(self, user_id, role):
+    def __init__(self, user_id=None, role=None):
         self.user_id = user_id
         self.role = role
         self.timestamp_now = int(datetime.datetime.now().strftime('%s'))
@@ -77,6 +77,22 @@ class HomeworkHelper(object):
                 updated_timestamp=row.updated_timestamp
             ))
         return homework_list
+
+    def get_creator_by_homework_uuid(self, homework_uuid):
+        try:
+            row = Homework.objects.get(uuid=homework_uuid)
+            creator = row.creator
+            return creator
+        except Homework.DoesNotExist:
+            return None
+
+    def get_submitter_by_submission_uuid(self, submission_uuid):
+        try:
+            row = Submission.objects.get(uuid=submission_uuid)
+            submitter = row.user_id
+            return submitter
+        except Submission.DoesNotExist:
+            return None
 
     def get_submission_list_by_homework(self, homework_uuid):
         submission_list = []

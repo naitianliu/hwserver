@@ -245,6 +245,10 @@ class ClassroomHelper(object):
             ))
         return members_dict
 
+    def get_members(self, classroom_uuid):
+        members = self.__get_members_by_classroom(classroom_uuid=classroom_uuid)
+        return members
+
     def __get_members_by_classroom(self, classroom_uuid):
         members = []
         for row in ClassroomMember.objects.filter(classroom_uuid=classroom_uuid, active=True):

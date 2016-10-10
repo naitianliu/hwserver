@@ -1,6 +1,7 @@
 from api.views_set.lib import *
 from api.functions.homework_helper import HomeworkHelper
 from api.functions.comment_helper import CommentHelper
+from api.functions.update_helper import UpdateHelper
 
 
 @api_view(['POST'])
@@ -16,10 +17,14 @@ def create(request):
     result_tup = homework_helper.create_new_homework(classroom_uuid, attrs)
     success = result_tup[0]
     homework_uuid = result_tup[1]
+    timestamp = homework_helper.timestamp_now
+    # update notification queue
+    if success:
+        UpdateHelper(user_id, role, timestamp=timestamp).new_homework(classroom_uuid)
     res_data = dict(
         success=success,
         homework_uuid=homework_uuid,
-        timestamp=homework_helper.timestamp_now
+        timestamp=timestamp
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -37,10 +42,14 @@ def submit(request):
     result_tup = homework_helper.submit_homework(homework_uuid, attrs)
     success = result_tup[0]
     submission_uuid = result_tup[1]
+    timestamp = homework_helper.timestamp_now
+    # update
+    if success:
+        UpdateHelper(user_id, role, timestamp=timestamp).new_submission(user_id, homework_uuid)
     res_data = dict(
         success=success,
         submission_uuid=submission_uuid,
-        timestamp=homework_helper.timestamp_now
+        timestamp=timestamp
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 
@@ -55,10 +64,14 @@ def grade(request):
     submission_uuid = req_data['submission_uuid']
     score = req_data['score']
     homework_helper = HomeworkHelper(user_id, role)
+    timestamp = homework_helper.timestamp_now
     success = homework_helper.grade_homework(submission_uuid, score)
+    # update
+    if success:
+        UpdateHelper(user_id, role, timestamp=timestamp).submission_graded(submission_uuid, score)
     res_data = dict(
         success=success,
-        timestamp=homework_helper.timestamp_now
+        timestamp=timestamp
     )
     return Response(data=res_data, status=status.HTTP_200_OK)
 

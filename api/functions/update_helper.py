@@ -1,11 +1,12 @@
 from django.core.cache import cache
 from user_auth.functions.profile_helper import ProfileHelper
 from api.functions.classroom_helper import ClassroomHelper
+from api.functions.homework_helper import HomeworkHelper
 from api.notification.apns_helper import APNSHelper
 from api.notification.message_template import MESSAGE
 import datetime
 
-UPDATE_KEY_TYPES = ['requests', 'approvals', 'submissions', 'members', 'classrooms', 'homeworks']
+UPDATE_KEY_TYPES = ['requests', 'approvals', 'submissions', 'members', 'classrooms', 'homeworks', 'grades']
 REDIS_TIMEOUT = 7*24*60*60
 
 
@@ -49,7 +50,6 @@ class UpdateHelper(object):
         self.__update_value(key, item_dict)
         # send message
         classroom_name = classroom_info['classroom_name'] if 'classroom_name' in classroom_info else ""
-        print classroom_name
         message = MESSAGE['approvals'].format(classroom_name)
         APNSHelper(requester_user_id).send_simple_notification(message)
 
@@ -57,17 +57,52 @@ class UpdateHelper(object):
         """T & S"""
         pass
 
-    def new_submission(self, student_user_id, submission_info):
+    def new_submission(self, student_user_id, homework_uuid):
         """Teacher only"""
-        pass
+        student_nickname = ProfileHelper(student_user_id).get_nickname_by_username(student_user_id)
+        creator = HomeworkHelper().get_creator_by_homework_uuid(homework_uuid)
+        item_dict = dict(
+            student_user_id=student_user_id,
+            student_nickname=student_nickname,
+            homework_uuid=homework_uuid
+        )
+        key = self.__get_key(creator, 't', UPDATE_KEY_TYPES[2])
+        self.__update_value(key, item_dict)
+        # send message
+        message = MESSAGE['submissions']
+        APNSHelper(creator).send_simple_notification(message)
 
-    def submission_graded(self):
+    def submission_graded(self, submission_uuid, score):
         """Student Only"""
-        pass
+        submitter = HomeworkHelper().get_submitter_by_submission_uuid(submission_uuid)
+        item_dict = dict(
+            submission_uuid=submission_uuid,
+            score=score
+        )
+        key = self.__get_key(submitter, 's', UPDATE_KEY_TYPES[6])
+        self.__update_value(key, item_dict)
+        # send message
+        message = MESSAGE['grades']
+        APNSHelper(submitter).send_simple_notification(message)
 
-    def new_homework(self):
+    def new_homework(self, classroom_uuid):
         """T & S"""
-        pass
+        classroom_helper = ClassroomHelper()
+        members = classroom_helper.get_members(classroom_uuid)
+        classroom_name = classroom_helper.get_classroom_name_by_uuid(classroom_uuid)
+        item_dict = dict(
+            classroom_uuid=classroom_uuid,
+            classroom_name=classroom_name,
+            timestamp=self.timestamp
+        )
+        for member in members:
+            user_id = member['user_id']
+            role = member['role']
+            key = self.__get_key(user_id, role, UPDATE_KEY_TYPES[5])
+            self.__update_value(key, item_dict)
+            # send message
+            message = MESSAGE['homeworks']
+            APNSHelper(user_id).send_simple_notification(message)
 
     def get_all_updates(self):
         """T & S"""

@@ -55,7 +55,7 @@ def close(request):
     user_id = request.user.username
     req_data = json.loads(request.body)
     role = req_data['role']
-    classroom_uuid = req_data['uuid']
+    classroom_uuid = req_data['classroom_uuid']
     success = ClassroomHelper(user_id, role).close_classroom(classroom_uuid)
     res_data = dict(
         success=success

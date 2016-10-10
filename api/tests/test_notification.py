@@ -9,6 +9,6 @@ class APNSHelperTest(TestCase):
         username = 'testuser'
         message = MESSAGE['requests'].format(username).encode('utf8')
         print message
-        device_token = '5F083895D1EC4AD3052F27D429C0A93FBF6820B47467D4A2DEF095697E76BBE3'
+        device_token = '5AA987E74BF22E688748A59A11C44E84E8AF357CB0435AEB1CADFBC2A079A20D'
         DeviceTokenHelper(username).add_update_device_token(device_token)
         APNSHelper(username).send_simple_notification(message)
