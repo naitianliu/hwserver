@@ -21,6 +21,22 @@ def question_create(request):
     return Response(data=res_data, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@authentication_classes((BasicAuthentication, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def question_close(request):
+    user_id = request.user.username
+    req_data = json.loads(request.body)
+    question_uuid = req_data['question_uuid']
+    role = req_data['role']
+    qa_helper = QAHelper(user_id, role)
+    success = qa_helper.close_question(question_uuid)
+    res_data = dict(
+        success=success
+    )
+    return Response(data=res_data, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @authentication_classes((BasicAuthentication, TokenAuthentication))
 @permission_classes((IsAuthenticated,))

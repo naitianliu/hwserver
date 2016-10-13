@@ -108,6 +108,7 @@ class Question(models.Model):
     creator = models.CharField(max_length=200)
     role = models.CharField(max_length=10)
     anonymous = models.BooleanField()
+    active = models.BooleanField(default=True)
     answer_count = models.IntegerField()
     content = models.TextField()
     created_timestamp = models.IntegerField()

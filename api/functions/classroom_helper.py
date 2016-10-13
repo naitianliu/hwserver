@@ -265,7 +265,6 @@ class ClassroomHelper(object):
         for member in members:
             role = member['role']
             user_id = member['user_id']
-
             rows = ClassroomMember.objects.filter(classroom_uuid=classroom_uuid,
                                                   user_id=user_id,
                                                   role=role)

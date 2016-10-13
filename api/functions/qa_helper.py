@@ -28,11 +28,26 @@ class QAHelper(object):
             creator=self.user_id,
             role=self.role,
             anonymous=self.anonymous,
+            active=True,
             answer_count=0,
             content=content,
             created_timestamp=self.timestamp_now,
             updated_timestamp=self.timestamp_now
         ).save()
+
+    def close_question(self, question_uuid):
+        try:
+            row = Question.objects.get(uuid=question_uuid)
+            creator = row.creator
+            if creator == self.user_id:
+                row.active = False
+                row.save()
+                success = True
+            else:
+                success = False
+        except Question.DoesNotExist:
+            success = False
+        return success
 
     def create_answer(self, question_uuid, classroom_uuid, content):
         success = True
@@ -67,13 +82,13 @@ class QAHelper(object):
     def get_question_list(self, filter_type, page_number, school_uuid, per_page=20):
         questions = []
         if filter_type == 'new':
-            p = Paginator(Question.objects.filter().order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter(active=True).order_by('-updated_timestamp'), per_page)
         elif filter_type == 'popular':
-            p = Paginator(Question.objects.filter().order_by('-answer_count', '-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter(active=True).order_by('-answer_count', '-updated_timestamp'), per_page)
         elif filter_type == 'me':
-            p = Paginator(Question.objects.filter(creator=self.user_id).order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter(active=True, creator=self.user_id).order_by('-updated_timestamp'), per_page)
         else:
-            p = Paginator(Question.objects.filter().order_by('-updated_timestamp'), per_page)
+            p = Paginator(Question.objects.filter(active=True).order_by('-updated_timestamp'), per_page)
         num_pages = p.num_pages
         if page_number <= num_pages:
             page_objects = p.page(page_number).object_list

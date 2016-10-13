@@ -27,10 +27,12 @@ class ProfileHelper(object):
     def get_profile(self):
         try:
             row = Profile.objects.get(username=self.username)
+            nickname = row.nickname if row.nickname else "unknown"
+            img_url = row.img_url if row.img_url else "none"
             profile_dict = dict(
                 user_id=self.username,
-                nickname=row.nickname,
-                img_url=row.img_url
+                nickname=nickname,
+                img_url=img_url
             )
             return profile_dict
         except Profile.DoesNotExist:
