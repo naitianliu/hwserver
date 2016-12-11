@@ -27,7 +27,7 @@ STATIC_ROOT = os.path.join(HERE, '../collectstatic')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'h64dl00()66-tn8!w^n5g+ug0rjpwnz+rywa$i83%2645ld6ek'
 
-PROD = False
+PROD = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PROD
