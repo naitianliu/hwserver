@@ -35,7 +35,7 @@ class UpdateHelper(object):
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['requests'].format(requester_profile_info['nickname'])
-        APNSHelper(creator_user_id).send_simple_notification(message)
+        tasks.send_apns_notification.delay(creator_user_id, message)
 
     def request_approved(self, requester_user_id, requester_role, classroom_uuid):
         """T & S"""
@@ -52,7 +52,7 @@ class UpdateHelper(object):
         # send message
         classroom_name = classroom_info['classroom_name'] if 'classroom_name' in classroom_info else ""
         message = MESSAGE['approvals'].format(classroom_name)
-        APNSHelper(requester_user_id).send_simple_notification(message)
+        tasks.send_apns_notification.delay(requester_user_id, message)
 
     def member_added_into_classroom(self, profile_info, classroom_info=None):
         """T & S"""
@@ -71,7 +71,7 @@ class UpdateHelper(object):
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['submissions']
-        APNSHelper(creator).send_simple_notification(message)
+        tasks.send_apns_notification.delay(creator, message)
 
     def submission_graded(self, submission_uuid, score):
         """Student Only"""
@@ -84,7 +84,7 @@ class UpdateHelper(object):
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['grades']
-        APNSHelper(submitter).send_simple_notification(message)
+        tasks.send_apns_notification.delay(submitter, message)
 
     def new_homework(self, classroom_uuid):
         """T & S"""
