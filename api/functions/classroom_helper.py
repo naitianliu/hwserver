@@ -211,7 +211,7 @@ class ClassroomHelper(object):
         classrooms = []
         members_dict = self.__get_members_dict(classroom_uuid_list)
         school_helper = SchoolHelper(self.user_id)
-        for row in Classroom.objects.filter(uuid__in=classroom_uuid_list):
+        for row in Classroom.objects.filter(uuid__in=classroom_uuid_list, active=True):
             classroom_uuid = row.uuid
             school_uuid = row.school_uuid
             school_info = school_helper.get_school_info_by_uuid(school_uuid)

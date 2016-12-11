@@ -2,8 +2,9 @@ from django.core.cache import cache
 from user_auth.functions.profile_helper import ProfileHelper
 from api.functions.classroom_helper import ClassroomHelper
 from api.functions.homework_helper import HomeworkHelper
-from api.notification.apns_helper import APNSHelper
 from api.notification.message_template import MESSAGE
+from api.async import tasks
+from api.notification.apns_helper import APNSHelper
 import datetime
 
 UPDATE_KEY_TYPES = ['requests', 'approvals', 'submissions', 'members', 'classrooms', 'homeworks', 'grades']
@@ -102,7 +103,7 @@ class UpdateHelper(object):
             self.__update_value(key, item_dict)
             # send message
             message = MESSAGE['homeworks']
-            APNSHelper(user_id).send_simple_notification(message)
+            tasks.send_apns_notification.delay(user_id, message)
 
     def get_all_updates(self):
         """T & S"""

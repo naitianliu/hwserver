@@ -36,6 +36,17 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+import djcelery
+from hwserver.config import REDIS as REDIS_CONFIG
+
+djcelery.setup_loader()
+if PROD:
+    BROKER_URL = REDIS_CONFIG['host']
+else:
+    BROKER_URL = 'redis://127.0.0.1:6379/1'
+
+CELERY_IMPORTS = ('api.async.tasks',)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +58,8 @@ INSTALLED_APPS = [
     'user_auth',
     'rest_framework',
     'rest_framework.authtoken',
+    'djcelery',
+    'kombu.transport.django'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -114,8 +127,6 @@ else:
     }
 
 # redis
-
-from hwserver.config import REDIS as REDIS_CONFIG
 
 if PROD:
     CACHES = {
