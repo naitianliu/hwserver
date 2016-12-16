@@ -65,7 +65,8 @@ class UpdateHelper(object):
         item_dict = dict(
             student_user_id=student_user_id,
             student_nickname=student_nickname,
-            homework_uuid=homework_uuid
+            homework_uuid=homework_uuid,
+            timestamp=self.timestamp
         )
         key = self.__get_key(creator, 't', UPDATE_KEY_TYPES[2])
         self.__update_value(key, item_dict)
@@ -78,7 +79,8 @@ class UpdateHelper(object):
         submitter = HomeworkHelper().get_submitter_by_submission_uuid(submission_uuid)
         item_dict = dict(
             submission_uuid=submission_uuid,
-            score=score
+            score=score,
+            timestamp=self.timestamp
         )
         key = self.__get_key(submitter, 's', UPDATE_KEY_TYPES[6])
         self.__update_value(key, item_dict)
