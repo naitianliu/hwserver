@@ -86,6 +86,14 @@ class HomeworkHelper(object):
         except Homework.DoesNotExist:
             return None
 
+    def get_homework_uuid_by_submission_uuid(self, submission_uuid):
+        try:
+            row = Submission.objects.get(uuid=submission_uuid)
+            homework_uuid = row.homework_uuid
+            return homework_uuid
+        except Submission.DoesNotExist:
+            return None
+
     def get_submitter_by_submission_uuid(self, submission_uuid):
         try:
             row = Submission.objects.get(uuid=submission_uuid)

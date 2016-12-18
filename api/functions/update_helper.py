@@ -4,10 +4,18 @@ from api.functions.classroom_helper import ClassroomHelper
 from api.functions.homework_helper import HomeworkHelper
 from api.notification.message_template import MESSAGE
 from api.async import tasks
-from api.notification.apns_helper import APNSHelper
 import datetime
 
-UPDATE_KEY_TYPES = ['requests', 'approvals', 'submissions', 'members', 'classrooms', 'homeworks', 'grades']
+UPDATE_KEY_TYPES = {
+    'requests': 'requests',
+    'approvals': 'approvals',
+    'submissions': 'submissions',
+    'members': 'members',
+    'classrooms': 'classrooms',
+    'homeworks': 'homeworks',
+    'grades': 'grades',
+    'comments': 'comments'
+}
 REDIS_TIMEOUT = 7*24*60*60
 
 
@@ -31,7 +39,7 @@ class UpdateHelper(object):
             requester_role=self.role,
             timestamp=self.timestamp
         )
-        key = self.__get_key(creator_user_id, 't', UPDATE_KEY_TYPES[0])
+        key = self.__get_key(creator_user_id, 't', UPDATE_KEY_TYPES['requests'])
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['requests'].format(requester_profile_info['nickname'])
@@ -47,7 +55,7 @@ class UpdateHelper(object):
             classroom_info=classroom_info,
             timestamp=self.timestamp
         )
-        key = self.__get_key(requester_user_id, requester_role, UPDATE_KEY_TYPES[1])
+        key = self.__get_key(requester_user_id, requester_role, UPDATE_KEY_TYPES['approvals'])
         self.__update_value(key, item_dict)
         # send message
         classroom_name = classroom_info['classroom_name'] if 'classroom_name' in classroom_info else ""
@@ -68,11 +76,28 @@ class UpdateHelper(object):
             homework_uuid=homework_uuid,
             timestamp=self.timestamp
         )
-        key = self.__get_key(creator, 't', UPDATE_KEY_TYPES[2])
+        key = self.__get_key(creator, 't', UPDATE_KEY_TYPES['submissions'])
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['submissions']
         tasks.send_apns_notification.delay(creator, message)
+
+    def new_comment(self, author_user_id, receiver_user_id, receiver_role, homework_uuid, submission_uuid, info):
+        """T & S"""
+        author_profile_info = ProfileHelper(author_user_id).get_profile()
+        item_dict = dict(
+            author_profile_info=author_profile_info,
+            homework_uuid=homework_uuid,
+            submission_uuid=submission_uuid,
+            info=info,
+            timestamp=self.timestamp
+        )
+        key = self.__get_key(receiver_user_id, receiver_role, UPDATE_KEY_TYPES['comments'])
+        self.__update_value(key, item_dict)
+        # send message
+        nickname = author_profile_info['nickname'] if author_profile_info else ""
+        message = MESSAGE['comments'].format(nickname)
+        tasks.send_apns_notification.delay(receiver_user_id, message)
 
     def submission_graded(self, submission_uuid, score):
         """Student Only"""
@@ -82,7 +107,7 @@ class UpdateHelper(object):
             score=score,
             timestamp=self.timestamp
         )
-        key = self.__get_key(submitter, 's', UPDATE_KEY_TYPES[6])
+        key = self.__get_key(submitter, 's', UPDATE_KEY_TYPES['grades'])
         self.__update_value(key, item_dict)
         # send message
         message = MESSAGE['grades']
@@ -101,7 +126,7 @@ class UpdateHelper(object):
         for member in members:
             user_id = member['user_id']
             role = member['role']
-            key = self.__get_key(user_id, role, UPDATE_KEY_TYPES[5])
+            key = self.__get_key(user_id, role, UPDATE_KEY_TYPES['homeworks'])
             self.__update_value(key, item_dict)
             # send message
             message = MESSAGE['homeworks']

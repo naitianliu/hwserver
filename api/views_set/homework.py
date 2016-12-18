@@ -18,7 +18,7 @@ def create(request):
     success = result_tup[0]
     homework_uuid = result_tup[1]
     timestamp = homework_helper.timestamp_now
-    # update notification queue
+    # update
     if success:
         UpdateHelper(user_id, role, timestamp=timestamp).new_homework(classroom_uuid)
     res_data = dict(
