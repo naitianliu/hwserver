@@ -129,12 +129,23 @@ def get_submission_list(request):
 def get_submission_info(request):
     user_id = request.user.username
     role = request.GET['role']
-    submission_uuid = request.GET['submission_uuid']
-    info = HomeworkHelper(user_id, role).get_submission_info(submission_uuid)
-    comments = CommentHelper(user_id, role).get_list(submission_uuid)
-    res_data = dict(
-        error=0,
-        submission=info,
-        comments=comments
-    )
+    if 'submission_uuid' in request.GET:
+        submission_uuid = request.GET['submission_uuid']
+    elif 'homework_uuid' in request.GET:
+        homework_uuid = request.GET['homework_uuid']
+        submission_uuid = HomeworkHelper(user_id, role).get_submission_uuid_by_homework_uuid(homework_uuid)
+    else:
+        submission_uuid = None
+    if submission_uuid:
+        info = HomeworkHelper(user_id, role).get_submission_info(submission_uuid)
+        comments = CommentHelper(user_id, role).get_list(submission_uuid)
+        res_data = dict(
+            error=0,
+            submission=info,
+            comments=comments
+        )
+    else:
+        res_data = dict(
+            error=1
+        )
     return Response(data=res_data, status=status.HTTP_200_OK)
