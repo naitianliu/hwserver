@@ -1,5 +1,5 @@
 django==1.9.7
 mysql-python==1.2.5
-djangorestframework==3.3.3
+djangorestframework==3.9.1
 aliyun-python-sdk-sts==2.1.6
 pytz
