@@ -5,7 +5,7 @@ apns==2.0.1
 certifi==2016.8.8
 Django==1.10
 django-redis==4.4.4
-djangorestframework==3.4.5
+djangorestframework==3.11.2
 MySQL-python==1.2.5
 ots2==2.0.8
 protobuf-py3==2.5.1
