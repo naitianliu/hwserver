@@ -2,7 +2,7 @@ aliyun-python-sdk-core==2.0.36
 aliyun-python-sdk-sts==2.1.6
 anyjson==0.3.3
 apns==2.0.1
-certifi==2016.8.8
+certifi==2022.12.7
 Django==1.10
 django-redis==4.4.4
 djangorestframework==3.4.5
